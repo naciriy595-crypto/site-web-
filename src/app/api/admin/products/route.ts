@@ -7,20 +7,20 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
+      { error: parsed.error.issues[0]?.message ?? "Invalid data" },
       { status: 400 }
     );
   }
 
   const existing = await prisma.product.findUnique({ where: { slug: parsed.data.slug } });
   if (existing) {
-    return NextResponse.json({ error: "Ce slug est déjà utilisé" }, { status: 409 });
+    return NextResponse.json({ error: "This slug is already in use" }, { status: 409 });
   }
 
   const { images, metaTitle, metaDesc, ...rest } = parsed.data;

@@ -9,7 +9,7 @@ export function OrderStatusTimeline({ status }: { status: string }) {
           <X size={16} />
         </span>
         <div>
-          <p className="text-sm font-medium text-red-700">Commande annulée</p>
+          <p className="text-sm font-medium text-red-700">Order Cancelled</p>
           <p className="text-xs text-red-600">{ORDER_STATUS_DESCRIPTIONS.CANCELLED}</p>
         </div>
       </div>

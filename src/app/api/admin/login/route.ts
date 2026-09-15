@@ -14,24 +14,24 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Email ou mot de passe invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid email or password" }, { status: 400 });
   }
 
   const { email, password } = parsed.data;
 
   const user = await prisma.adminUser.findUnique({ where: { email } });
   if (!user) {
-    return NextResponse.json({ error: "Identifiants incorrects" }, { status: 401 });
+    return NextResponse.json({ error: "Incorrect credentials" }, { status: 401 });
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    return NextResponse.json({ error: "Identifiants incorrects" }, { status: 401 });
+    return NextResponse.json({ error: "Incorrect credentials" }, { status: 401 });
   }
 
   const token = await createSessionToken({ sub: user.id, email: user.email, name: user.name });

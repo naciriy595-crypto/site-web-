@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const statuses = [
-  { value: "NEW", label: "Nouvelle" },
-  { value: "PROCESSING", label: "En traitement" },
-  { value: "SHIPPED", label: "Expédiée" },
-  { value: "DELIVERED", label: "Livrée" },
-  { value: "CANCELLED", label: "Annulée" },
+  { value: "NEW", label: "New" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "SHIPPED", label: "Shipped" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "CANCELLED", label: "Cancelled" },
 ];
 
 export function OrderStatusSelect({ orderId, status }: { orderId: string; status: string }) {
@@ -33,7 +33,7 @@ export function OrderStatusSelect({ orderId, status }: { orderId: string; status
       value={current}
       disabled={loading}
       onChange={(e) => handleChange(e.target.value)}
-      className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+      className="flex h-9 items-center rounded-full border border-border bg-surface px-3 text-xs font-medium disabled:opacity-50"
     >
       {statuses.map((s) => (
         <option key={s.value} value={s.value}>

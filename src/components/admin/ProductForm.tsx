@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Category = { id: string; nameFr: string };
+type Category = { id: string; name: string };
 
 type InitialProduct = {
   id?: string;
@@ -90,7 +90,7 @@ export function ProductForm({
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.error || "Une erreur est survenue.");
+      setError(data.error || "Something went wrong.");
       setSubmitting(false);
       return;
     }
@@ -103,7 +103,7 @@ export function ProductForm({
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium">Nom</label>
+          <label className="mb-1 block text-sm font-medium">Name</label>
           <input
             required
             value={name}
@@ -111,7 +111,7 @@ export function ProductForm({
               setName(e.target.value);
               if (!slugTouched) setSlug(slugify(e.target.value));
             }}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
         <div>
@@ -123,24 +123,24 @@ export function ProductForm({
               setSlug(e.target.value);
               setSlugTouched(true);
             }}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Description courte</label>
+        <label className="mb-1 block text-sm font-medium">Short description</label>
         <input
           required
           value={shortDesc}
           onChange={(e) => setShortDesc(e.target.value)}
           maxLength={200}
-          className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+          className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Description complète</label>
+        <label className="mb-1 block text-sm font-medium">Full description</label>
         <textarea
           required
           value={description}
@@ -152,36 +152,36 @@ export function ProductForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <label className="mb-1 block text-sm font-medium">Prix (MAD)</label>
+          <label className="mb-1 block text-sm font-medium">Price (MAD)</label>
           <input
             required
             type="number"
             min={0}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Prix barré (optionnel)</label>
+          <label className="mb-1 block text-sm font-medium">Compare-at price (optional)</label>
           <input
             type="number"
             min={0}
             value={compareAtPrice}
             onChange={(e) => setCompareAtPrice(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Catégorie</label>
+          <label className="mb-1 block text-sm font-medium">Category</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           >
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.nameFr}
+                {c.name}
               </option>
             ))}
           </select>
@@ -190,7 +190,7 @@ export function ProductForm({
 
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Images (une URL par ligne — ex. /products/mon-image.svg)
+          Images (one URL per line — e.g. /products/my-image.webp)
         </label>
         <textarea
           required
@@ -198,7 +198,7 @@ export function ProductForm({
           onChange={(e) => setImages(e.target.value)}
           rows={3}
           className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
-          placeholder="/products/exemple-1.svg"
+          placeholder="/products/example-1.webp"
         />
       </div>
 
@@ -208,29 +208,30 @@ export function ProductForm({
           <select
             value={stockStatus}
             onChange={(e) => setStockStatus(e.target.value as "IN_STOCK" | "OUT_OF_STOCK")}
-            className="rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           >
-            <option value="IN_STOCK">En stock</option>
-            <option value="OUT_OF_STOCK">Rupture de stock</option>
+            <option value="IN_STOCK">In Stock</option>
+            <option value="OUT_OF_STOCK">Out of Stock</option>
           </select>
         </div>
-        <label className="mt-6 flex items-center gap-2 text-sm">
+        <label className="mt-6 flex min-h-11 items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={featured}
             onChange={(e) => setFeatured(e.target.checked)}
+            className="h-4 w-4"
           />
-          Mettre en avant sur la page d&apos;accueil
+          Feature on homepage (Best Sellers)
         </label>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium">Meta titre (SEO)</label>
+          <label className="mb-1 block text-sm font-medium">Meta title (SEO)</label>
           <input
             value={metaTitle}
             onChange={(e) => setMetaTitle(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
         <div>
@@ -238,7 +239,7 @@ export function ProductForm({
           <input
             value={metaDesc}
             onChange={(e) => setMetaDesc(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
       </div>
@@ -248,9 +249,9 @@ export function ProductForm({
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="flex min-h-12 items-center rounded-full bg-foreground px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
-        {submitting ? "Enregistrement..." : isEdit ? "Mettre à jour" : "Créer le produit"}
+        {submitting ? "Saving..." : isEdit ? "Update Product" : "Create Product"}
       </button>
     </form>
   );

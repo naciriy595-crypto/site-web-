@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Banknote, Truck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatMAD } from "@/lib/format";
 import { formatOrderNumber } from "@/lib/order-number";
@@ -22,26 +22,37 @@ export default async function OrderConfirmationPage({
   const orderNumber = formatOrderNumber(order.orderNumber);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
       <div className="flex flex-col items-center text-center">
         <CheckCircle2 size={48} className="text-foreground" />
-        <h1 className="mt-4 font-display text-3xl uppercase tracking-wide">
-          Merci pour votre commande
+        <h1 className="mt-4 font-display text-2xl uppercase tracking-wide sm:text-3xl">
+          Thank You for Your Order
         </h1>
         <p className="mt-3 font-display text-xl tracking-wide">{orderNumber}</p>
         <p className="mt-2 text-sm text-muted">
-          Notez ce numéro : il vous permet de suivre votre colis à tout moment.
-          Nous vous contacterons pour organiser la livraison — paiement à la réception.
+          Save this number — you can use it anytime to track your package.
+          We&apos;ll contact you shortly to arrange delivery.
         </p>
       </div>
 
-      <div className="mt-8 rounded-xl border border-border bg-surface p-6">
+      <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-4 text-sm">
+          <Banknote size={16} className="shrink-0 text-muted" />
+          <span>Cash on Delivery — pay when your order arrives</span>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-4 text-sm">
+          <Truck size={16} className="shrink-0 text-muted" />
+          <span>{order.estimatedDelivery || "Estimated delivery: 2–5 business days"}</span>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-xl border border-border bg-surface p-6">
         <OrderStatusTimeline status={order.status} />
       </div>
 
       <div className="mt-6 rounded-xl border border-border bg-surface p-6">
         <h2 className="font-display text-lg uppercase tracking-wide">
-          Résumé de la commande
+          Order Summary
         </h2>
 
         <div className="mt-4 space-y-3">
@@ -61,26 +72,38 @@ export default async function OrderConfirmationPage({
         </div>
 
         <div className="mt-6 grid gap-1 text-sm text-muted">
-          <p><span className="text-foreground">Nom :</span> {order.customerName}</p>
-          <p><span className="text-foreground">Téléphone :</span> {order.phone}</p>
-          <p><span className="text-foreground">Ville :</span> {order.city}</p>
-          <p><span className="text-foreground">Adresse :</span> {order.address}</p>
-          {order.notes && <p><span className="text-foreground">Note :</span> {order.notes}</p>}
+          <p><span className="text-foreground">Name:</span> {order.customerName}</p>
+          <p><span className="text-foreground">Phone:</span> {order.phone}</p>
+          <p><span className="text-foreground">City:</span> {order.city}</p>
+          <p><span className="text-foreground">Address:</span> {order.address}</p>
+          {order.notes && <p><span className="text-foreground">Note:</span> {order.notes}</p>}
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
+      <p className="mt-6 text-center text-sm text-muted">
+        Questions about your order? Reach us on{" "}
+        <a href="https://instagram.com/clifstone.co" target="_blank" rel="noopener noreferrer" className="underline">
+          Instagram
+        </a>{" "}
+        or at{" "}
+        <a href="mailto:clifstone44@gmail.com" className="underline">
+          clifstone44@gmail.com
+        </a>
+        .
+      </p>
+
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Link
           href={`/track?order=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(order.phone)}`}
-          className="rounded-full border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-foreground/40"
+          className="flex min-h-12 items-center rounded-full border border-border px-6 text-sm font-medium text-foreground transition-colors hover:border-foreground/40"
         >
-          Suivre ma commande
+          Track My Order
         </Link>
         <Link
           href="/shop/all"
-          className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="flex min-h-12 items-center rounded-full bg-foreground px-6 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
-          Continuer mes achats
+          Continue Shopping
         </Link>
       </div>
     </div>

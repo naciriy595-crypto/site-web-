@@ -2,18 +2,19 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { buildOrderMessage, buildWhatsAppLink, STORE_WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { nextOrderNumber, formatOrderNumber } from "@/lib/order-number";
+import { formatOrderNumber } from "@/lib/order-number";
+import { ameexProvider } from "@/lib/delivery/ameex";
 
 const checkoutSchema = z.object({
-  customerName: z.string().trim().min(2, "Nom trop court").max(120),
+  customerName: z.string().trim().min(2, "Name is too short"),
   phone: z
     .string()
     .trim()
-    .min(9, "Numéro de téléphone invalide")
+    .min(9, "Invalid phone number")
     .max(20)
-    .regex(/^[0-9+ ]+$/, "Numéro de téléphone invalide"),
-  city: z.string().trim().min(2, "Ville requise").max(80),
-  address: z.string().trim().min(5, "Adresse trop courte").max(300),
+    .regex(/^[0-9+ ]+$/, "Invalid phone number"),
+  city: z.string().trim().min(2, "City is required").max(80),
+  address: z.string().trim().min(5, "Address is too short").max(300),
   notes: z.string().trim().max(500).optional().or(z.literal("")),
   items: z
     .array(
@@ -22,7 +23,7 @@ const checkoutSchema = z.object({
         quantity: z.number().int().min(1).max(50),
       })
     )
-    .min(1, "Le panier est vide"),
+    .min(1, "Your cart is empty"),
 });
 
 export async function POST(req: Request) {
@@ -30,13 +31,13 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = checkoutSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
+      { error: parsed.error.issues[0]?.message ?? "Invalid data" },
       { status: 400 }
     );
   }
@@ -47,13 +48,13 @@ export async function POST(req: Request) {
   const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
 
   if (products.length !== new Set(productIds).size) {
-    return NextResponse.json({ error: "Un ou plusieurs produits sont introuvables" }, { status: 400 });
+    return NextResponse.json({ error: "One or more products could not be found" }, { status: 400 });
   }
 
   const outOfStock = products.find((p) => p.stockStatus === "OUT_OF_STOCK");
   if (outOfStock) {
     return NextResponse.json(
-      { error: `"${outOfStock.name}" est en rupture de stock` },
+      { error: `"${outOfStock.name}" is out of stock` },
       { status: 400 }
     );
   }
@@ -70,22 +71,63 @@ export async function POST(req: Request) {
 
   const total = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const order = await prisma.$transaction(async (tx) => {
-    const orderNumber = await nextOrderNumber(tx);
-    return tx.order.create({
-      data: {
-        orderNumber,
-        customerName,
-        phone,
-        city,
-        address,
-        notes: notes || null,
-        total,
-        items: { create: orderItems },
-      },
+  let order = await prisma.order.create({
+    data: {
+      customerName,
+      phone,
+      city,
+      address,
+      notes: notes || null,
+      total,
+      items: { create: orderItems },
+    },
+    include: { items: true },
+  });
+
+  // Automatically try to register the shipment with Ameex. If it fails for
+  // any reason (not configured yet, network error, rejected request), the
+  // order stays saved as-is and we flag it for the admin instead of losing
+  // the order or blocking checkout.
+  let shipmentFailureReason: string | null = null;
+  if (ameexProvider.isConfigured()) {
+    try {
+      const result = await ameexProvider.createShipment({
+        orderNumber: formatOrderNumber(order.orderNumber),
+        customerName: order.customerName,
+        phone: order.phone,
+        city: order.city,
+        address: order.address,
+        notes: order.notes,
+        codAmount: order.total,
+        items: order.items,
+      });
+      order = await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          status: "SHIPPED",
+          carrierName: result.carrierName,
+          carrierTrackingId: result.trackingId,
+          carrierLabelUrl: result.labelUrl ?? null,
+          estimatedDelivery: result.estimatedDelivery ?? null,
+        },
+        include: { items: true },
+      });
+    } catch (err) {
+      shipmentFailureReason = err instanceof Error ? err.message : "Unknown error";
+      order = await prisma.order.update({
+        where: { id: order.id },
+        data: { shipmentError: shipmentFailureReason },
+        include: { items: true },
+      });
+    }
+  } else {
+    shipmentFailureReason = "Ameex is not configured yet";
+    order = await prisma.order.update({
+      where: { id: order.id },
+      data: { shipmentError: shipmentFailureReason },
       include: { items: true },
     });
-  });
+  }
 
   const message = buildOrderMessage({
     orderNumber: order.orderNumber,
@@ -103,5 +145,7 @@ export async function POST(req: Request) {
     orderId: order.id,
     orderNumber: formatOrderNumber(order.orderNumber),
     whatsappLink,
+    estimatedDelivery: order.estimatedDelivery,
+    shipmentFailureReason,
   });
 }

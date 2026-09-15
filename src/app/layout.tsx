@@ -18,17 +18,17 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Clifstone — Montres, lunettes & accessoires",
+    default: "Clifstone — Watches, Sunglasses & Accessories",
     template: "%s | Clifstone",
   },
   description:
-    "Clifstone — marque marocaine de montres, lunettes de soleil, portefeuilles, bijoux et accessoires. Livraison gratuite, paiement à la livraison.",
+    "Clifstone — a Moroccan brand of watches, sunglasses, wallets, jewelry and accessories. Free shipping, Cash on Delivery.",
   openGraph: {
     title: "Clifstone",
     description:
-      "Gothic streetwear-luxe, façon marocaine. Livraison gratuite, paiement à la livraison.",
+      "Gothic streetwear-luxe, Moroccan made. Free shipping, Cash on Delivery.",
     siteName: "Clifstone",
-    locale: "fr_MA",
+    locale: "en_US",
     type: "website",
   },
 };
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="fr"
+      lang="en"
       className={`${bodyFont.variable} ${displayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

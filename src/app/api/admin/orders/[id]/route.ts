@@ -12,12 +12,12 @@ export async function PATCH(
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = orderStatusSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
 
   const order = await prisma.order.update({

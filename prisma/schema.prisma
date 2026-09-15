@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -23,8 +23,7 @@ enum OrderStatus {
 model Category {
   id          String    @id @default(cuid())
   slug        String    @unique
-  nameFr      String
-  nameAr      String
+  name        String
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -51,17 +50,9 @@ model Product {
   orderItems    OrderItem[]
 }
 
-// Single-row counters used to generate human-friendly sequential numbers
-// (SQLite only supports autoincrement() on the primary key, so order numbers
-// are assigned atomically in a transaction instead — see src/lib/order-number.ts).
-model Counter {
-  key   String @id
-  value Int    @default(0)
-}
-
 model Order {
   id                String      @id @default(cuid())
-  orderNumber       Int         @unique
+  orderNumber       Int         @unique @default(autoincrement())
   customerName      String
   phone             String
   city              String
@@ -72,6 +63,8 @@ model Order {
   carrierName       String?
   carrierTrackingId String?
   carrierLabelUrl   String?
+  estimatedDelivery String?
+  shipmentError     String?
   items             OrderItem[]
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt

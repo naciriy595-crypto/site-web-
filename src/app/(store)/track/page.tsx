@@ -39,47 +39,50 @@ function TrackForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Commande introuvable");
+        setError(data.error || "Order not found");
         setLoading(false);
         return;
       }
       setResult(data);
     } catch {
-      setError("Impossible de contacter le serveur. Réessayez.");
+      setError("Could not reach the server. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl uppercase tracking-wide text-center">
-        Suivre ma commande
+    <div className="mx-auto max-w-lg px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="font-display text-2xl uppercase tracking-wide text-center sm:text-3xl">
+        Track Your Order
       </h1>
       <p className="mt-2 text-center text-sm text-muted">
-        Entrez votre numéro de commande et votre téléphone pour voir où en est votre colis.
+        Enter your order number and phone number to see where your package is.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium">Numéro de commande</label>
+          <label htmlFor="tr-order" className="mb-1 block text-sm font-medium">Order number</label>
           <input
+            id="tr-order"
             required
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
             placeholder="CLF-000123"
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-12 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Téléphone</label>
+          <label htmlFor="tr-phone" className="mb-1 block text-sm font-medium">Phone number</label>
           <input
+            id="tr-phone"
             required
             type="tel"
+            inputMode="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="06 12 34 56 78"
-            className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="flex h-12 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
           />
         </div>
 
@@ -90,16 +93,16 @@ function TrackForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex min-h-12 w-full items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "Recherche..." : "Suivre ma commande"}
+          {loading ? "Searching..." : "Track Order"}
         </button>
       </form>
 
       {result && (
         <div className="mt-8 space-y-6 rounded-xl border border-border bg-surface p-6">
           <div className="text-center">
-            <p className="text-xs uppercase tracking-wide text-muted">Commande</p>
+            <p className="text-xs uppercase tracking-wide text-muted">Order</p>
             <p className="font-display text-xl tracking-wide">{result.orderNumber}</p>
           </div>
 
@@ -108,10 +111,10 @@ function TrackForm() {
           {result.carrierTrackingId && (
             <div className="rounded-lg border border-border bg-background p-4 text-sm">
               <p>
-                <span className="text-muted">Transporteur :</span> {result.carrierName}
+                <span className="text-muted">Carrier:</span> {result.carrierName}
               </p>
               <p className="mt-1">
-                <span className="text-muted">N° de suivi :</span> {result.carrierTrackingId}
+                <span className="text-muted">Tracking number:</span> {result.carrierTrackingId}
               </p>
               {result.carrierTrackingUrl && (
                 <a
@@ -120,7 +123,7 @@ function TrackForm() {
                   rel="noopener noreferrer"
                   className="mt-2 inline-block text-foreground underline"
                 >
-                  Suivre le colis chez {result.carrierName}
+                  Track package with {result.carrierName}
                 </a>
               )}
             </div>
@@ -141,7 +144,7 @@ function TrackForm() {
             </div>
           </div>
 
-          <p className="text-center text-xs text-muted">Livraison à {result.city}</p>
+          <p className="text-center text-xs text-muted">Delivering to {result.city}</p>
         </div>
       )}
     </div>

@@ -3,9 +3,9 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const options = [
-  { value: "newest", label: "Nouveautés" },
-  { value: "price-asc", label: "Prix croissant" },
-  { value: "price-desc", label: "Prix décroissant" },
+  { value: "newest", label: "Newest" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
 ];
 
 export function SortSelect() {
@@ -24,8 +24,8 @@ export function SortSelect() {
         const qs = params.toString();
         router.push(qs ? `${pathname}?${qs}` : pathname);
       }}
-      className="rounded-full border border-border bg-surface px-3 py-2 text-sm"
-      aria-label="Trier les produits"
+      className="flex h-9 items-center rounded-full border border-border bg-surface px-3 text-sm"
+      aria-label="Sort products"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>

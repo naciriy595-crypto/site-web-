@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Banknote } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { formatMAD } from "@/lib/format";
 import { useHasMounted } from "@/lib/use-has-mounted";
@@ -30,13 +31,13 @@ export default function CheckoutPage() {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center sm:px-6">
         <h1 className="font-display text-3xl uppercase tracking-wide">
-          Votre panier est vide
+          Your Cart is Empty
         </h1>
         <Link
           href="/shop/all"
-          className="mt-6 inline-block rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white"
+          className="mt-6 inline-flex min-h-12 items-center rounded-full bg-foreground px-6 text-sm font-medium text-white"
         >
-          Voir la boutique
+          Shop All
         </Link>
       </div>
     );
@@ -60,7 +61,7 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Une erreur est survenue.");
+        setError(data.error || "Something went wrong.");
         setSubmitting(false);
         return;
       }
@@ -71,84 +72,94 @@ export default function CheckoutPage() {
       }
       router.push(`/order/${data.orderId}`);
     } catch {
-      setError("Impossible de contacter le serveur. Réessayez.");
+      setError("Could not reach the server. Please try again.");
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-3xl uppercase tracking-wide">Commande</h1>
-      <p className="mt-2 text-sm text-muted">
-        Paiement à la livraison (COD) uniquement · Livraison gratuite partout au Maroc.
-      </p>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+      <h1 className="font-display text-2xl uppercase tracking-wide sm:text-3xl">Checkout</h1>
 
-      <div className="mt-8 grid gap-10 md:grid-cols-2">
+      <div className="mt-4 flex items-center gap-3 rounded-xl border border-accent/25 bg-accent/[0.06] p-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-ink">
+          <Banknote size={18} />
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-foreground">Cash on Delivery</p>
+          <p className="text-xs text-muted">Pay only when you receive your order — no card, no online payment.</p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-8 md:grid-cols-2 md:gap-10">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Nom complet</label>
+            <label htmlFor="ck-name" className="mb-1 block text-sm font-medium">Full name</label>
             <input
+              id="ck-name"
               required
+              autoComplete="name"
               value={form.customerName}
               onChange={(e) => setForm({ ...form, customerName: e.target.value })}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
-              placeholder="Votre nom"
+              className="flex h-12 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
+              placeholder="Your name"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Téléphone</label>
+            <label htmlFor="ck-phone" className="mb-1 block text-sm font-medium">Phone number</label>
             <input
+              id="ck-phone"
               required
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="flex h-12 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
               placeholder="06 12 34 56 78"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Ville</label>
+            <label htmlFor="ck-city" className="mb-1 block text-sm font-medium">City</label>
             <input
+              id="ck-city"
               required
+              autoComplete="address-level2"
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="flex h-12 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
               placeholder="Casablanca, Rabat, Marrakech..."
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Adresse de livraison</label>
+            <label htmlFor="ck-address" className="mb-1 block text-sm font-medium">Delivery address</label>
             <textarea
+              id="ck-address"
               required
+              autoComplete="street-address"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm outline-none focus:border-foreground"
               rows={3}
-              placeholder="Quartier, rue, numéro..."
+              placeholder="Neighborhood, street, building number..."
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              Note de commande <span className="text-muted">(optionnel)</span>
+            <label htmlFor="ck-notes" className="mb-1 block text-sm font-medium">
+              Order notes <span className="font-normal text-muted">(optional)</span>
             </label>
             <textarea
+              id="ck-notes"
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm outline-none focus:border-foreground"
               rows={2}
-              placeholder="Instructions particulières..."
+              placeholder="Delivery instructions, preferred time, etc."
             />
-          </div>
-
-          <div className="rounded-lg border border-border bg-surface p-4 text-sm">
-            <p className="font-medium">Paiement à la livraison</p>
-            <p className="mt-1 text-muted">
-              Vous payez en espèces au livreur à la réception de votre colis.
-            </p>
           </div>
 
           {error && (
@@ -158,14 +169,17 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-foreground px-6 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex min-h-12 w-full items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {submitting ? "Confirmation en cours..." : `Confirmer la commande — ${formatMAD(totalPrice)}`}
+            {submitting ? "Placing order..." : `Place Order (COD) — ${formatMAD(totalPrice)}`}
           </button>
+          <p className="text-center text-xs text-muted">
+            100% Cash on Delivery — no online payment required.
+          </p>
         </form>
 
         <div className="h-fit rounded-xl border border-border bg-surface p-5">
-          <h2 className="font-display text-lg uppercase tracking-wide">Résumé</h2>
+          <h2 className="font-display text-lg uppercase tracking-wide">Order Summary</h2>
           <div className="mt-4 space-y-3">
             {lines.map((l) => (
               <div key={l.productId} className="flex justify-between text-sm">
@@ -178,8 +192,8 @@ export default function CheckoutPage() {
           </div>
           <div className="mt-4 border-t border-border pt-4 space-y-2 text-sm">
             <div className="flex justify-between text-muted">
-              <span>Livraison</span>
-              <span className="text-foreground">Gratuite</span>
+              <span>Shipping</span>
+              <span className="text-foreground">Free</span>
             </div>
             <div className="flex justify-between text-base font-semibold">
               <span>Total</span>

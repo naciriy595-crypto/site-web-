@@ -8,7 +8,8 @@
   --border: #e3e0d8;
   --chrome-start: #f4f3f0;
   --chrome-end: #b9b6ad;
-  --accent: #131215;
+  --accent: #7a1f2b;
+  --accent-ink: #fdf4f0;
 }
 
 @theme inline {
@@ -18,6 +19,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 }

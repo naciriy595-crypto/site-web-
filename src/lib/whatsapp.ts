@@ -19,19 +19,32 @@ export type WhatsAppOrderInfo = {
 
 export function buildOrderMessage(order: WhatsAppOrderInfo): string {
   const lines = [
-    `Nouvelle commande Clifstone ${formatOrderNumber(order.orderNumber)}`,
+    `New Clifstone order ${formatOrderNumber(order.orderNumber)}`,
     "",
-    `Client: ${order.customerName}`,
-    `Téléphone: ${order.phone}`,
-    `Ville: ${order.city}`,
-    `Adresse: ${order.address}`,
+    `Customer: ${order.customerName}`,
+    `Phone: ${order.phone}`,
+    `City: ${order.city}`,
+    `Address: ${order.address}`,
     order.notes ? `Note: ${order.notes}` : null,
     "",
-    "Articles:",
+    "Items:",
     ...order.items.map((it) => `- ${it.name} x${it.quantity} — ${it.price * it.quantity} MAD`),
     "",
-    `Total: ${order.total} MAD (COD, livraison gratuite)`,
+    `Total: ${order.total} MAD (Cash on Delivery, free shipping)`,
   ].filter((l): l is string => l !== null);
+  return lines.join("\n");
+}
+
+export function buildShipmentFailureAlert(order: WhatsAppOrderInfo, reason: string): string {
+  const lines = [
+    `⚠️ Ameex auto-shipment FAILED for order ${formatOrderNumber(order.orderNumber)}`,
+    "",
+    `Customer: ${order.customerName}`,
+    `Phone: ${order.phone}`,
+    `Reason: ${reason}`,
+    "",
+    "The order was saved normally — please create the shipment manually from the admin panel.",
+  ];
   return lines.join("\n");
 }
 

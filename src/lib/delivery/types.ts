@@ -13,11 +13,12 @@ export type ShipmentResult = {
   carrierName: string;
   trackingId: string;
   labelUrl?: string;
+  estimatedDelivery?: string;
 };
 
 export class DeliveryNotConfiguredError extends Error {
   constructor(carrier: string) {
-    super(`${carrier} n'est pas configuré (variables d'environnement manquantes).`);
+    super(`${carrier} is not configured (missing environment variables).`);
     this.name = "DeliveryNotConfiguredError";
   }
 }

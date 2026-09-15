@@ -3,18 +3,18 @@ import { Truck, ShieldCheck, Banknote } from "lucide-react";
 const badges = [
   {
     icon: Truck,
-    title: "Livraison gratuite",
-    desc: "Partout au Maroc, sans exception",
+    title: "Free Shipping",
+    desc: "Nationwide, no exceptions",
   },
   {
     icon: Banknote,
-    title: "Paiement à la livraison",
-    desc: "Payez en espèces à la réception",
+    title: "Cash on Delivery",
+    desc: "Pay in cash when it arrives",
   },
   {
     icon: ShieldCheck,
-    title: "Qualité garantie",
-    desc: "Matériaux sélectionnés, contrôle qualité",
+    title: "Quality Guaranteed",
+    desc: "Selected materials, quality checked",
   },
 ];
 

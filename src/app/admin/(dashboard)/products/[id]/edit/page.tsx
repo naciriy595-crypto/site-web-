@@ -12,14 +12,14 @@ export default async function EditProductPage({
 
   const [product, categories] = await Promise.all([
     prisma.product.findUnique({ where: { id } }),
-    prisma.category.findMany({ orderBy: { nameFr: "asc" } }),
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!product) notFound();
 
   return (
     <div>
-      <h1 className="font-display text-3xl uppercase tracking-wide">Modifier le produit</h1>
+      <h1 className="font-display text-3xl uppercase tracking-wide">Edit Product</h1>
       <div className="mt-6">
         <ProductForm
           categories={categories}

@@ -5,6 +5,7 @@ import { parseImages } from "@/lib/types";
 import { formatMAD } from "@/lib/format";
 import { ProductGallery } from "@/components/ProductGallery";
 import { AddToCartActions } from "@/components/AddToCartActions";
+import { WishlistButton } from "@/components/WishlistButton";
 import { ProductCard } from "@/components/ProductCard";
 import { Truck, Banknote } from "lucide-react";
 
@@ -41,19 +42,29 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div className="grid gap-10 md:grid-cols-2">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className="grid gap-8 md:grid-cols-2 md:gap-10">
         <ProductGallery images={images} name={product.name} />
 
         <div className="space-y-6">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-muted">
-              {product.category.nameFr} · <span dir="rtl">{product.category.nameAr}</span>
-            </p>
-            <h1 className="mt-1 font-display text-3xl uppercase tracking-wide">
-              {product.name}
-            </h1>
-            <p className="mt-2 text-sm text-muted">{product.shortDesc}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted">
+                {product.category.name}
+              </p>
+              <h1 className="mt-1 font-display text-2xl uppercase tracking-wide sm:text-3xl">
+                {product.name}
+              </h1>
+              <p className="mt-2 text-sm text-muted">{product.shortDesc}</p>
+            </div>
+            <WishlistButton
+              productId={product.id}
+              slug={product.slug}
+              name={product.name}
+              price={product.price}
+              image={images[0] ?? ""}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-surface hover:border-foreground/40"
+            />
           </div>
 
           <div className="flex items-baseline gap-3">
@@ -76,10 +87,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
           <div className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-surface p-4 text-sm sm:grid-cols-2">
             <div className="flex items-center gap-2 text-muted">
-              <Truck size={16} /> Livraison gratuite
+              <Truck size={16} /> Free shipping
             </div>
             <div className="flex items-center gap-2 text-muted">
-              <Banknote size={16} /> Paiement à la livraison
+              <Banknote size={16} /> Cash on delivery
             </div>
           </div>
 
@@ -90,11 +101,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       </div>
 
       {related.length > 0 && (
-        <div className="mt-16">
+        <div className="mt-14 sm:mt-16">
           <h2 className="mb-6 font-display text-2xl uppercase tracking-wide">
-            Vous aimerez aussi
+            Related Products
           </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

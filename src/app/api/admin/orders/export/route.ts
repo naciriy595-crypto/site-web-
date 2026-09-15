@@ -7,14 +7,14 @@ import { formatOrderNumber } from "@/lib/order-number";
 // your Ameex account portal expects different column names.
 const HEADERS = [
   "Reference",
-  "Nom destinataire",
-  "Telephone",
-  "Ville",
-  "Adresse",
-  "Produits",
-  "Quantite totale",
-  "Montant COD (MAD)",
-  "Remarque",
+  "Recipient Name",
+  "Phone",
+  "City",
+  "Address",
+  "Products",
+  "Total Quantity",
+  "COD Amount (MAD)",
+  "Note",
 ];
 
 function csvEscape(value: string): string {
@@ -57,7 +57,7 @@ export async function GET(req: Request) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="clifstone-commandes-ameex.csv"`,
+      "Content-Disposition": `attachment; filename="clifstone-orders-ameex.csv"`,
     },
   });
 }

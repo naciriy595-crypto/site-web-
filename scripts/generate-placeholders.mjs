@@ -63,24 +63,15 @@ function svgFor(name, categoryKey, seedIndex) {
 </svg>`;
 }
 
+// Watches and wallets now ship with real product photography (see
+// scripts/process-product-photos.mjs) — this script only covers the
+// categories still waiting on real photos.
 export const seedProducts = {
-  watches: [
-    "Onyx Chrono",
-    "Midnight Steel",
-    "Argent Classic",
-    "Noir Heritage",
-  ],
   sunglasses: [
     "Shadow Wrap",
     "Chrome Aviator",
     "Obsidian Round",
     "Ghost Frame",
-  ],
-  wallets: [
-    "Slate Bifold",
-    "Carbon Card Case",
-    "Noir Leather Fold",
-    "Ash Cardholder",
   ],
   jewelry: ["Iron Chain", "Silver Cross Pendant", "Signet Noir", "Chrome Hoop"],
   accessories: ["Steel Keyring", "Noir Cap", "Chrome Belt", "Signature Pin"],

@@ -25,7 +25,7 @@ function LoginForm() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "Connexion impossible");
+      setError(data.error || "Could not log in");
       setLoading(false);
       return;
     }
@@ -41,7 +41,7 @@ function LoginForm() {
         <div className="flex justify-center">
           <Logo className="h-14" />
         </div>
-        <h1 className="mt-6 text-center text-lg font-medium">Espace admin</h1>
+        <h1 className="mt-6 text-center text-lg font-medium">Admin Login</h1>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -49,19 +49,21 @@ function LoginForm() {
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="flex h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-foreground"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Mot de passe</label>
+            <label className="mb-1 block text-sm font-medium">Password</label>
             <input
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              className="flex h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-foreground"
             />
           </div>
 
@@ -72,9 +74,9 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex min-h-12 w-full items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
       </div>

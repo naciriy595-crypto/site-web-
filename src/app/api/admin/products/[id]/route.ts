@@ -12,13 +12,13 @@ export async function PATCH(
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Données invalides" },
+      { error: parsed.error.issues[0]?.message ?? "Invalid data" },
       { status: 400 }
     );
   }
@@ -27,7 +27,7 @@ export async function PATCH(
     where: { slug: parsed.data.slug, NOT: { id } },
   });
   if (existing) {
-    return NextResponse.json({ error: "Ce slug est déjà utilisé" }, { status: 409 });
+    return NextResponse.json({ error: "This slug is already in use" }, { status: 409 });
   }
 
   const { images, metaTitle, metaDesc, ...rest } = parsed.data;
@@ -56,7 +56,7 @@ export async function DELETE(
     await prisma.product.update({ where: { id }, data: { stockStatus: "OUT_OF_STOCK" } });
     return NextResponse.json({
       archived: true,
-      message: "Produit présent dans des commandes existantes : marqué comme rupture de stock au lieu d'être supprimé.",
+      message: "This product is used in existing orders, so it was marked out of stock instead of deleted.",
     });
   }
 

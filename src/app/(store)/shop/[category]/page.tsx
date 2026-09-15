@@ -9,7 +9,7 @@ type Params = { category: string };
 type Search = { sort?: string; inStock?: string };
 
 async function getCategories() {
-  return prisma.category.findMany({ orderBy: { nameFr: "asc" } });
+  return prisma.category.findMany({ orderBy: { name: "asc" } });
 }
 
 export async function generateMetadata({
@@ -19,12 +19,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { category } = await params;
   if (category === "all") {
-    return { title: "Toute la boutique" };
+    return {
+      title: "Shop All",
+      description: "Browse the full Clifstone collection: watches, sunglasses, wallets, jewelry and accessories.",
+    };
   }
   const cat = await prisma.category.findUnique({ where: { slug: category } });
   if (!cat) return {};
   return {
-    title: cat.nameFr,
+    title: cat.name,
     description: cat.description ?? undefined,
   };
 }
@@ -61,45 +64,38 @@ export default async function ShopCategoryPage({
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div className="mb-6 flex flex-wrap gap-2">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mb-6 flex flex-wrap gap-2 overflow-x-auto">
         <Link
           href="/shop/all"
-          className={`rounded-full border px-4 py-1.5 text-sm ${
+          className={`flex min-h-9 items-center rounded-full border px-4 text-sm ${
             category === "all"
               ? "border-foreground bg-foreground text-white"
               : "border-border text-muted hover:border-foreground/40"
           }`}
         >
-          Tout
+          All
         </Link>
         {categories.map((c) => (
           <Link
             key={c.slug}
             href={`/shop/${c.slug}`}
-            className={`rounded-full border px-4 py-1.5 text-sm ${
+            className={`flex min-h-9 items-center rounded-full border px-4 text-sm ${
               c.slug === category
                 ? "border-foreground bg-foreground text-white"
                 : "border-border text-muted hover:border-foreground/40"
             }`}
           >
-            {c.nameFr}
+            {c.name}
           </Link>
         ))}
       </div>
 
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-3xl uppercase tracking-wide">
-            {activeCategory ? activeCategory.nameFr : "Toute la boutique"}
-          </h1>
-          {activeCategory && (
-            <p className="text-sm text-muted" dir="rtl">
-              {activeCategory.nameAr}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl uppercase tracking-wide sm:text-3xl">
+          {activeCategory ? activeCategory.name : "Shop All"}
+        </h1>
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href={
               inStock === "1"
@@ -109,13 +105,13 @@ export default async function ShopCategoryPage({
                     inStock: "1",
                   }).toString()}`
             }
-            className={`hidden rounded-full border px-3 py-2 text-xs sm:block ${
+            className={`flex min-h-9 items-center rounded-full border px-3 text-xs ${
               inStock === "1"
                 ? "border-foreground bg-foreground text-white"
                 : "border-border text-muted"
             }`}
           >
-            En stock uniquement
+            In stock only
           </Link>
           <SortSelect />
         </div>
@@ -123,10 +119,10 @@ export default async function ShopCategoryPage({
 
       {products.length === 0 ? (
         <p className="py-20 text-center text-muted">
-          Aucun produit dans cette catégorie pour le moment.
+          No products in this category yet.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

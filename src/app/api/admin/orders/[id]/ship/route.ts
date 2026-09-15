@@ -14,14 +14,14 @@ export async function POST(
 
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } });
   if (!order) {
-    return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
   if (!ameexProvider.isConfigured()) {
     return NextResponse.json(
       {
         error:
-          "Ameex n'est pas encore connecté (AMEEX_API_BASE_URL / AMEEX_API_KEY manquants). Utilisez l'export CSV ou ajoutez un numéro de suivi manuellement en attendant.",
+          "Ameex is not connected yet (AMEEX_API_BASE_URL / AMEEX_API_ID / AMEEX_API_KEY missing). Use the CSV export or add a tracking number manually in the meantime.",
         notConfigured: true,
       },
       { status: 422 }
@@ -47,6 +47,8 @@ export async function POST(
         carrierName: result.carrierName,
         carrierTrackingId: result.trackingId,
         carrierLabelUrl: result.labelUrl ?? null,
+        estimatedDelivery: result.estimatedDelivery ?? null,
+        shipmentError: null,
       },
     });
 
@@ -56,7 +58,7 @@ export async function POST(
       return NextResponse.json({ error: err.message, notConfigured: true }, { status: 422 });
     }
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Échec de l'envoi vers le transporteur" },
+      { error: err instanceof Error ? err.message : "Failed to send to the carrier" },
       { status: 502 }
     );
   }
@@ -79,12 +81,12 @@ export async function PATCH(
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = manualSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Transporteur et numéro de suivi requis" }, { status: 400 });
+    return NextResponse.json({ error: "Carrier and tracking number are required" }, { status: 400 });
   }
 
   const order = await prisma.order.update({
@@ -93,6 +95,7 @@ export async function PATCH(
       carrierName: parsed.data.carrierName,
       carrierTrackingId: parsed.data.carrierTrackingId,
       status: "SHIPPED",
+      shipmentError: null,
     },
   });
 

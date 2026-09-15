@@ -18,17 +18,17 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = trackSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Numéro de commande et téléphone requis" }, { status: 400 });
+    return NextResponse.json({ error: "Order number and phone are required" }, { status: 400 });
   }
 
   const n = parseOrderNumber(parsed.data.orderNumber);
   if (!n) {
-    return NextResponse.json({ error: "Numéro de commande introuvable" }, { status: 404 });
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
   const order = await prisma.order.findUnique({
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
   if (!order || normalizePhone(order.phone) !== normalizePhone(parsed.data.phone)) {
     return NextResponse.json(
-      { error: "Aucune commande trouvée avec ce numéro et ce téléphone" },
+      { error: "No order found with that number and phone" },
       { status: 404 }
     );
   }

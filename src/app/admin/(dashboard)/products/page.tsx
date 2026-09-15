@@ -14,13 +14,13 @@ export default async function AdminProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl uppercase tracking-wide">Produits</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-3xl uppercase tracking-wide">Products</h1>
         <Link
           href="/admin/products/new"
-          className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-white hover:opacity-90"
         >
-          <Plus size={16} /> Ajouter un produit
+          <Plus size={16} /> Add Product
         </Link>
       </div>
 
@@ -28,11 +28,11 @@ export default async function AdminProductsPage() {
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted">
-              <th className="px-4 py-3">Produit</th>
-              <th className="px-4 py-3">Catégorie</th>
-              <th className="px-4 py-3">Prix</th>
+              <th className="px-4 py-3">Product</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Price</th>
               <th className="px-4 py-3">Stock</th>
-              <th className="px-4 py-3">Vedette</th>
+              <th className="px-4 py-3">Featured</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -49,7 +49,7 @@ export default async function AdminProductsPage() {
                       <span className="font-medium">{p.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-muted">{p.category.nameFr}</td>
+                  <td className="px-4 py-3 text-muted">{p.category.name}</td>
                   <td className="px-4 py-3">{formatMAD(p.price)}</td>
                   <td className="px-4 py-3">
                     <span
@@ -59,16 +59,16 @@ export default async function AdminProductsPage() {
                           : "bg-red-50 text-red-700"
                       }`}
                     >
-                      {p.stockStatus === "IN_STOCK" ? "En stock" : "Rupture"}
+                      {p.stockStatus === "IN_STOCK" ? "In Stock" : "Out of Stock"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-muted">{p.featured ? "Oui" : "—"}</td>
+                  <td className="px-4 py-3 text-muted">{p.featured ? "Yes" : "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       <Link
                         href={`/admin/products/${p.id}/edit`}
-                        className="p-2 text-muted hover:text-foreground"
-                        aria-label={`Modifier ${p.name}`}
+                        className="flex h-10 w-10 items-center justify-center text-muted hover:text-foreground"
+                        aria-label={`Edit ${p.name}`}
                       >
                         <Pencil size={16} />
                       </Link>
@@ -81,7 +81,7 @@ export default async function AdminProductsPage() {
             {products.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-muted">
-                  Aucun produit. Ajoutez-en un pour commencer.
+                  No products yet. Add one to get started.
                 </td>
               </tr>
             )}
