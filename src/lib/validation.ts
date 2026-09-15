@@ -16,6 +16,14 @@ export const productSchema = z.object({
   images: z.array(z.string().trim().min(1)).min(1, "At least one image is required"),
   stockStatus: z.enum(["IN_STOCK", "OUT_OF_STOCK"]),
   featured: z.boolean().optional(),
+  color: z.string().trim().max(60).optional().or(z.literal("")),
+  variantGroup: z
+    .string()
+    .trim()
+    .max(150)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid variant group (lowercase letters, numbers, hyphens only)")
+    .optional()
+    .or(z.literal("")),
   metaTitle: z.string().trim().max(200).optional().or(z.literal("")),
   metaDesc: z.string().trim().max(300).optional().or(z.literal("")),
 });

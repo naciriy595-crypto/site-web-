@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "This slug is already in use" }, { status: 409 });
   }
 
-  const { images, metaTitle, metaDesc, ...rest } = parsed.data;
+  const { images, metaTitle, metaDesc, color, variantGroup, ...rest } = parsed.data;
 
   const product = await prisma.product.create({
     data: {
@@ -31,6 +31,8 @@ export async function POST(req: Request) {
       images: JSON.stringify(images),
       metaTitle: metaTitle || null,
       metaDesc: metaDesc || null,
+      color: color || null,
+      variantGroup: variantGroup || null,
     },
   });
 

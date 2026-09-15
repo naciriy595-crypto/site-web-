@@ -17,6 +17,8 @@ type InitialProduct = {
   images: string[];
   stockStatus: "IN_STOCK" | "OUT_OF_STOCK";
   featured: boolean;
+  color?: string | null;
+  variantGroup?: string | null;
   metaTitle?: string | null;
   metaDesc?: string | null;
 };
@@ -52,6 +54,8 @@ export function ProductForm({
   const [images, setImages] = useState((initial?.images ?? []).join("\n"));
   const [stockStatus, setStockStatus] = useState(initial?.stockStatus ?? "IN_STOCK");
   const [featured, setFeatured] = useState(initial?.featured ?? false);
+  const [color, setColor] = useState(initial?.color ?? "");
+  const [variantGroup, setVariantGroup] = useState(initial?.variantGroup ?? "");
   const [metaTitle, setMetaTitle] = useState(initial?.metaTitle ?? "");
   const [metaDesc, setMetaDesc] = useState(initial?.metaDesc ?? "");
 
@@ -74,6 +78,8 @@ export function ProductForm({
       images: images.split("\n").map((s) => s.trim()).filter(Boolean),
       stockStatus,
       featured,
+      color,
+      variantGroup,
       metaTitle,
       metaDesc,
     };
@@ -185,6 +191,34 @@ export function ProductForm({
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium">Color (optional)</label>
+          <input
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            placeholder="e.g. Onyx, Crimson, Teal"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Variant group (optional)
+          </label>
+          <input
+            value={variantGroup}
+            onChange={(e) => setVariantGroup(e.target.value)}
+            placeholder="e.g. fang-bezel"
+            className="flex h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm outline-none focus:border-foreground"
+          />
+          <p className="mt-1 text-xs text-muted">
+            Give two or more color variants of the same model the same
+            variant group slug — they&apos;ll show as one product card with a
+            color picker on the storefront.
+          </p>
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { TrustBadges } from "@/components/TrustBadges";
+import { groupProducts } from "@/lib/variants";
 
 // Belt-and-suspenders: (store)/layout.tsx already forces dynamic rendering
 // for this whole route group, but the homepage has no dynamic segment of
@@ -22,8 +23,11 @@ export default async function HomePage() {
     prisma.product.findMany({ take: 8, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const bestSellerIds = new Set(bestSellers.map((p) => p.id));
-  const newArrivals = newest.filter((p) => !bestSellerIds.has(p.id)).slice(0, 4);
+  const bestSellerGroups = groupProducts(bestSellers);
+  const bestSellerGroupKeys = new Set(bestSellerGroups.map((g) => g.key));
+  const newArrivalGroups = groupProducts(
+    newest.filter((p) => !bestSellerGroupKeys.has(p.variantGroup || p.id))
+  ).slice(0, 4);
 
   return (
     <div>
@@ -77,7 +81,7 @@ export default async function HomePage() {
           <CategoryGrid categories={categories} />
         </section>
 
-        {bestSellers.length > 0 && (
+        {bestSellerGroups.length > 0 && (
           <section className="py-12 sm:py-14">
             <div className="mb-6 flex items-end justify-between">
               <div>
@@ -91,14 +95,14 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {bestSellers.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {bestSellerGroups.map((g) => (
+                <ProductCard key={g.key} product={g} />
               ))}
             </div>
           </section>
         )}
 
-        {newArrivals.length > 0 && (
+        {newArrivalGroups.length > 0 && (
           <section className="py-12 sm:py-14">
             <div className="mb-6 flex items-end justify-between">
               <h2 className="font-display text-2xl uppercase tracking-wide">
@@ -109,8 +113,8 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {newArrivals.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {newArrivalGroups.map((g) => (
+                <ProductCard key={g.key} product={g} />
               ))}
             </div>
           </section>

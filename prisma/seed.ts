@@ -13,6 +13,8 @@ type SeedProduct = {
   images: string[];
   featured?: boolean;
   stockStatus?: StockStatus;
+  color?: string;
+  variantGroup?: string;
 };
 
 type SeedCategory = {
@@ -41,6 +43,8 @@ const categories: SeedCategory[] = [
           "/products/watches-fang-bezel-onyx-2.webp",
         ],
         featured: true,
+        color: "Onyx",
+        variantGroup: "fang-bezel",
       },
       {
         slug: "fang-bezel-crimson",
@@ -50,6 +54,8 @@ const categories: SeedCategory[] = [
           "The same sculpted claw/fang bezel design as our Onyx edition, finished with a striking deep red dial. Solid stainless steel construction, water resistant, and built to turn heads.",
         price: 890,
         images: ["/products/watches-fang-bezel-crimson-1.webp"],
+        color: "Crimson",
+        variantGroup: "fang-bezel",
       },
       {
         slug: "orbit-chrono-teal",
@@ -63,6 +69,8 @@ const categories: SeedCategory[] = [
           "/products/watches-orbit-chrono-teal-2.webp",
         ],
         featured: true,
+        color: "Teal",
+        variantGroup: "orbit-chrono",
       },
       {
         slug: "orbit-chrono-crimson",
@@ -72,6 +80,8 @@ const categories: SeedCategory[] = [
           "Same rounded case and raised globe emblem as our Teal edition, finished in a bold red dial with a brushed silver bezel. Polished stainless steel band, comfortable for all-day wear.",
         price: 750,
         images: ["/products/watches-orbit-chrono-crimson-1.webp"],
+        color: "Crimson",
+        variantGroup: "orbit-chrono",
       },
       {
         slug: "orbit-chrono-graphite",
@@ -81,6 +91,8 @@ const categories: SeedCategory[] = [
           "The understated edition of our Orbit Chrono: a graphite and black globe-emblem dial inside a polished stainless steel case. Minimal, versatile, and easy to dress up or down.",
         price: 750,
         images: ["/products/watches-orbit-chrono-graphite-1.webp"],
+        color: "Graphite",
+        variantGroup: "orbit-chrono",
       },
       {
         slug: "titanium-chrono",
@@ -156,6 +168,8 @@ const categories: SeedCategory[] = [
           "/products/wallets-panther-case-noir-gold-4.webp",
         ],
         featured: true,
+        color: "Noir Gold",
+        variantGroup: "panther-case",
       },
       {
         slug: "panther-case-scarlet",
@@ -165,6 +179,8 @@ const categories: SeedCategory[] = [
           "The same durable stainless steel card and cash case, finished with a bold red panel and a striking black cat print. A compact, protective way to carry your cards and cash.",
         price: 320,
         images: ["/products/wallets-panther-case-scarlet-1.webp"],
+        color: "Scarlet",
+        variantGroup: "panther-case",
       },
     ],
   },
@@ -289,6 +305,8 @@ async function main() {
           categoryId: category.id,
           featured: p.featured ?? false,
           stockStatus: p.stockStatus ?? StockStatus.IN_STOCK,
+          color: p.color ?? null,
+          variantGroup: p.variantGroup ?? null,
           metaTitle: `${p.name} | Clifstone`,
           metaDesc: p.shortDesc,
         },
@@ -303,6 +321,8 @@ async function main() {
           categoryId: category.id,
           featured: p.featured ?? false,
           stockStatus: p.stockStatus ?? StockStatus.IN_STOCK,
+          color: p.color ?? null,
+          variantGroup: p.variantGroup ?? null,
           metaTitle: `${p.name} | Clifstone`,
           metaDesc: p.shortDesc,
         },

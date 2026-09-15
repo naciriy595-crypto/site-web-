@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parseImages } from "@/lib/types";
@@ -8,6 +9,8 @@ import { AddToCartActions } from "@/components/AddToCartActions";
 import { WishlistButton } from "@/components/WishlistButton";
 import { ProductCard } from "@/components/ProductCard";
 import { Truck, Banknote } from "lucide-react";
+import { groupProducts, deriveColor, deriveBaseName } from "@/lib/variants";
+import { colorHex } from "@/lib/colors";
 
 type Params = { slug: string };
 
@@ -36,10 +39,23 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   const images = parseImages(product.images);
 
-  const related = await prisma.product.findMany({
-    where: { categoryId: product.categoryId, NOT: { id: product.id } },
-    take: 4,
+  const siblings = product.variantGroup
+    ? await prisma.product.findMany({
+        where: { variantGroup: product.variantGroup },
+        orderBy: { price: "asc" },
+      })
+    : [];
+
+  const relatedRaw = await prisma.product.findMany({
+    where: {
+      categoryId: product.categoryId,
+      NOT: product.variantGroup
+        ? { variantGroup: product.variantGroup }
+        : { id: product.id },
+    },
+    take: 12,
   });
+  const related = groupProducts(relatedRaw).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
@@ -53,7 +69,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                 {product.category.name}
               </p>
               <h1 className="mt-1 font-display text-2xl uppercase tracking-wide sm:text-3xl">
-                {product.name}
+                {deriveBaseName(product)}
               </h1>
               <p className="mt-2 text-sm text-muted">{product.shortDesc}</p>
             </div>
@@ -75,6 +91,30 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               </span>
             )}
           </div>
+
+          {siblings.length > 1 && (
+            <div>
+              <p className="mb-2 text-xs uppercase tracking-wide text-muted">
+                Color: <span className="text-foreground">{deriveColor(product)}</span>
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                {siblings.map((s) => (
+                  <Link
+                    key={s.slug}
+                    href={`/product/${s.slug}`}
+                    title={deriveColor(s)}
+                    aria-label={`View ${deriveColor(s)} color`}
+                    className={`h-8 w-8 rounded-full border-2 transition-colors ${
+                      s.id === product.id
+                        ? "border-foreground"
+                        : "border-border hover:border-foreground/40"
+                    }`}
+                    style={{ backgroundColor: colorHex(deriveColor(s)) }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           <AddToCartActions
             productId={product.id}
@@ -106,8 +146,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             Related Products
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {related.map((g) => (
+              <ProductCard key={g.key} product={g} />
             ))}
           </div>
         </div>

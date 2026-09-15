@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { SortSelect } from "@/components/SortSelect";
+import { groupProducts } from "@/lib/variants";
 
 type Params = { category: string };
 type Search = { sort?: string; inStock?: string };
@@ -63,6 +64,8 @@ export default async function ShopCategoryPage({
     orderBy,
   });
 
+  const grouped = groupProducts(products);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex flex-wrap gap-2 overflow-x-auto">
@@ -117,14 +120,14 @@ export default async function ShopCategoryPage({
         </div>
       </div>
 
-      {products.length === 0 ? (
+      {grouped.length === 0 ? (
         <p className="py-20 text-center text-muted">
           No products in this category yet.
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {grouped.map((g) => (
+            <ProductCard key={g.key} product={g} />
           ))}
         </div>
       )}
