@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f6f3;
+  --surface: #ffffff;
+  --foreground: #131215;
+  --muted: #6b675f;
+  --border: #e3e0d8;
+  --chrome-start: #f4f3f0;
+  --chrome-end: #b9b6ad;
+  --accent: #7a1f2b;
+  --accent-ink: #fdf4f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
+
+.chrome-text {
+  background: linear-gradient(115deg, #3a3a3f 0%, #d8d6cf 35%, #131215 55%, #c9c6bd 75%, #3a3a3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
