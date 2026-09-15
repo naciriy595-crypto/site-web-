@@ -17,7 +17,7 @@ export default async function AdminDashboardLayout({
       <aside className="flex flex-col justify-between bg-[#131215] px-4 py-6 md:w-64 md:min-h-screen">
         <div>
           <div className="px-2">
-            <Logo dark className="text-xl" />
+            <Logo dark className="h-8" />
           </div>
           <div className="mt-8">
             <AdminNav />

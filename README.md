@@ -115,14 +115,20 @@ customer. Set `AMEEX_TRACKING_URL_TEMPLATE` (e.g.
 `https://ameex.ma/track/{id}`) once you know Ameex's own tracking page
 format, and both the admin and customer tracking views will link out to it.
 
-## Notes on the logo
+## Logo
 
-The Clifstone wordmark shown in chat was only shared as an inline image, not
-as a file this environment could save — so the header/footer/favicon
-currently use a CSS "chrome" text wordmark (`src/components/Logo.tsx`) and a
-generated favicon (`src/app/icon.svg`) as a stand-in for the same mood. Drop
-the real logo file into `public/brand/` and swap it into `Logo.tsx` and
-`icon.svg` when you have it as a file.
+The real Clifstone graffiti wordmark lives at
+`public/brand/clifstone-logo-original.jpg` (the source photo) with two
+derived assets checked in: `public/brand/logo-wordmark.webp` (used by
+`src/components/Logo.tsx` in the header, footer, admin sidebar, and login
+page) and `src/app/icon.png` / `apple-icon.png` (favicon / home-screen icon,
+cropped to just the leading letterform since a favicon doesn't need to be
+legible as full text).
+
+If you get a higher-resolution version of the logo later, drop it in as
+`public/brand/clifstone-logo-original.jpg` and re-run
+`node scripts/crop-logo.mjs` to regenerate all three derived assets with the
+same crop framing.
 
 ## Scripts
 

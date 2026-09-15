@@ -39,7 +39,7 @@ function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
         <div className="flex justify-center">
-          <Logo />
+          <Logo className="h-14" />
         </div>
         <h1 className="mt-6 text-center text-lg font-medium">Espace admin</h1>
 

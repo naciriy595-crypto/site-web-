@@ -28,7 +28,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-3">
           <div>
-            <Logo className="text-xl" />
+            <Logo className="h-8" />
             <p className="mt-3 max-w-xs text-sm text-muted">
               Gothic streetwear-luxe, façon marocaine. Montres, lunettes,
               maroquinerie et bijoux pensés pour durer.
