@@ -1,82 +1,99 @@
 import type { DeliveryProvider, ShipmentOrderInput, ShipmentResult } from "./types";
 import { DeliveryNotConfiguredError } from "./types";
 
+const AMEEX_BASE_URL = "https://api.ameex.app";
+const AMEEX_ADD_PARCEL_PATH = "/customer/Delivery/Parcels/Action/Type/Add";
+
 /**
- * Ameex integration — PLACEHOLDER pending their real API documentation.
+ * Ameex integration, wired to their real "Add Parcel" endpoint.
  *
- * We have an API ID + API Key but still no base URL, auth header format, or
- * endpoint/field spec from Ameex, so this cannot make a real call yet — it
- * sends a best-guess REST request shaped like a typical Moroccan last-mile
- * carrier's "create COD shipment" call. Once you get the base URL and real
- * docs, set AMEEX_API_BASE_URL and update the request shape below (endpoint
- * path, header names, field names) to match exactly. Everything else — the
- * automatic call at checkout, the graceful failure path, the admin alert,
- * the manual tracking fallback — already works and won't need to change.
+ * Two fields are still unverified for this specific account and may need
+ * adjusting once you see a real response or failure from Ameex:
+ *  - `business`: comes from AMEEX_BUSINESS_ID. Confirm this is your actual
+ *    business/store id in Ameex, not just an example value.
+ *  - `city`: Ameex's docs example shows a numeric city code (e.g. "1"), but
+ *    we don't have their city-code list, so this sends the plain city name
+ *    typed at checkout. If Ameex requires a numeric code instead, shipment
+ *    creation will fail gracefully (order still saves, admin gets a
+ *    WhatsApp alert) until we add the real name -> code mapping.
  */
 export class AmeexProvider implements DeliveryProvider {
   name = "Ameex";
 
   isConfigured(): boolean {
     return Boolean(
-      process.env.AMEEX_API_BASE_URL &&
+      process.env.AMEEX_API_ID &&
         process.env.AMEEX_API_KEY &&
-        process.env.AMEEX_API_ID
+        process.env.AMEEX_BUSINESS_ID
     );
   }
 
   async createShipment(order: ShipmentOrderInput): Promise<ShipmentResult> {
-    const baseUrl = process.env.AMEEX_API_BASE_URL;
     const apiId = process.env.AMEEX_API_ID;
     const apiKey = process.env.AMEEX_API_KEY;
+    const businessId = process.env.AMEEX_BUSINESS_ID;
 
-    if (!baseUrl || !apiId || !apiKey) {
+    if (!apiId || !apiKey || !businessId) {
       throw new DeliveryNotConfiguredError(this.name);
     }
 
-    // TODO: replace this endpoint + payload shape with what Ameex's docs specify.
-    const res = await fetch(`${baseUrl.replace(/\/$/, "")}/orders`, {
+    const form = new FormData();
+    form.append("type", "SIMPLE");
+    form.append("business", businessId);
+    form.append("order_num", order.orderNumber);
+    form.append("replace", "true");
+    form.append("open", "YES");
+    form.append("try", "YES");
+    form.append("fragile", "0");
+    form.append("receiver", order.customerName);
+    form.append("phone", order.phone);
+    form.append("city", order.city);
+    form.append("address", order.address);
+    form.append("comment", order.notes ?? "");
+    form.append(
+      "product",
+      order.items.map((i) => `${i.name} x${i.quantity}`).join(", ")
+    );
+    form.append("cod", String(order.codAmount));
+
+    const res = await fetch(`${AMEEX_BASE_URL}${AMEEX_ADD_PARCEL_PATH}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "X-Api-Id": apiId,
-        "X-Api-Key": apiKey,
+        "C-Api-Id": apiId,
+        "C-Api-Key": apiKey,
       },
-      body: JSON.stringify({
-        apiId,
-        apiKey,
-        reference: order.orderNumber,
-        recipient_name: order.customerName,
-        recipient_phone: order.phone,
-        city: order.city,
-        address: order.address,
-        note: order.notes ?? undefined,
-        cod_amount: order.codAmount,
-        products: order.items.map((i) => `${i.name} x${i.quantity}`).join(", "),
-      }),
+      body: form,
       signal: AbortSignal.timeout(10_000),
     });
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`Ameex rejected the shipment (${res.status}): ${text || "unknown error"}`);
+    const raw = await res.text();
+    let data: Record<string, unknown> = {};
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      // Non-JSON response — fall through with data = {}, raw kept for the error message.
     }
 
-    const data = (await res.json()) as {
-      tracking_id?: string;
-      id?: string;
-      label_url?: string;
-      estimated_delivery?: string;
-    };
-    const trackingId = data.tracking_id ?? data.id;
+    if (!res.ok) {
+      throw new Error(`Ameex rejected the shipment (${res.status}): ${raw || "unknown error"}`);
+    }
+
+    const payload = (data.data ?? data) as Record<string, unknown>;
+    const trackingId =
+      (payload.tracking_num as string | undefined) ??
+      (payload.code as string | undefined) ??
+      (payload.parcel_code as string | undefined) ??
+      (payload.id as string | undefined);
+
     if (!trackingId) {
-      throw new Error("Unexpected Ameex response: no tracking id found.");
+      throw new Error(`Unexpected Ameex response: no tracking id found. Raw: ${raw}`);
     }
 
     return {
       carrierName: this.name,
       trackingId,
-      labelUrl: data.label_url,
-      estimatedDelivery: data.estimated_delivery,
+      labelUrl: payload.label_url as string | undefined,
+      estimatedDelivery: payload.estimated_delivery as string | undefined,
     };
   }
 }
