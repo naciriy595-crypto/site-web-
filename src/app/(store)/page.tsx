@@ -5,6 +5,12 @@ import { ProductCard } from "@/components/ProductCard";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { TrustBadges } from "@/components/TrustBadges";
 
+// Belt-and-suspenders: (store)/layout.tsx already forces dynamic rendering
+// for this whole route group, but the homepage has no dynamic segment of
+// its own, so it's the one most likely to get statically prerendered again
+// if the layout-level setting is ever changed.
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [bestSellers, categories, newest] = await Promise.all([
     prisma.product.findMany({

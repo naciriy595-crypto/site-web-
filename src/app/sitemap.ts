@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
+// Reads the database (products/categories) — must not be statically
+// generated at build time. See src/app/(store)/layout.tsx for why.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, categories] = await Promise.all([
     prisma.product.findMany({ select: { slug: true, updatedAt: true } }),
