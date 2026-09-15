@@ -45,6 +45,7 @@ export function Footer() {
               <li><Link href="/shop/wallets" className="hover:text-foreground">Portefeuilles</Link></li>
               <li><Link href="/shop/jewelry" className="hover:text-foreground">Bijoux</Link></li>
               <li><Link href="/shop/accessories" className="hover:text-foreground">Accessoires</Link></li>
+              <li><Link href="/track" className="hover:text-foreground">Suivre ma commande</Link></li>
             </ul>
           </div>
 

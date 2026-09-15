@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, Truck } from "lucide-react";
 import { Logo } from "./Logo";
 import { CartCount } from "./CartCount";
 
@@ -34,6 +34,12 @@ export function Header({ categories }: { categories: NavCategory[] }) {
               {c.nameFr}
             </Link>
           ))}
+          <Link
+            href="/track"
+            className="inline-flex items-center gap-1.5 text-foreground/60 hover:text-foreground transition-colors"
+          >
+            <Truck size={15} /> Suivre ma commande
+          </Link>
         </nav>
 
         <Link
@@ -58,6 +64,9 @@ export function Header({ categories }: { categories: NavCategory[] }) {
               {c.nameFr} <span className="text-muted">· {c.nameAr}</span>
             </Link>
           ))}
+          <Link href="/track" onClick={() => setOpen(false)} className="py-1.5 flex items-center gap-1.5">
+            <Truck size={15} /> Suivre ma commande
+          </Link>
         </nav>
       )}
     </header>

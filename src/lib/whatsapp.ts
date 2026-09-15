@@ -1,3 +1,5 @@
+import { formatOrderNumber } from "./order-number";
+
 export type WhatsAppOrderItem = {
   name: string;
   quantity: number;
@@ -5,7 +7,7 @@ export type WhatsAppOrderItem = {
 };
 
 export type WhatsAppOrderInfo = {
-  id: string;
+  orderNumber: number;
   customerName: string;
   phone: string;
   city: string;
@@ -17,7 +19,7 @@ export type WhatsAppOrderInfo = {
 
 export function buildOrderMessage(order: WhatsAppOrderInfo): string {
   const lines = [
-    `Nouvelle commande Clifstone #${order.id.slice(-6).toUpperCase()}`,
+    `Nouvelle commande Clifstone ${formatOrderNumber(order.orderNumber)}`,
     "",
     `Client: ${order.customerName}`,
     `Téléphone: ${order.phone}`,

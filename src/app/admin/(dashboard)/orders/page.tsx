@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatMAD } from "@/lib/format";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
+import { formatOrderNumber } from "@/lib/order-number";
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -72,7 +73,7 @@ export default async function AdminOrdersPage({
               <tr key={o.id} className="border-b border-border last:border-0">
                 <td className="px-4 py-3">
                   <Link href={`/admin/orders/${o.id}`} className="font-medium hover:underline">
-                    #{o.id.slice(-6).toUpperCase()}
+                    {formatOrderNumber(o.orderNumber)}
                   </Link>
                 </td>
                 <td className="px-4 py-3">{o.customerName}</td>

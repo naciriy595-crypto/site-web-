@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatMAD } from "@/lib/format";
+import { formatOrderNumber } from "@/lib/order-number";
+import { OrderStatusTimeline } from "@/components/OrderStatusTimeline";
 
 export default async function OrderConfirmationPage({
   params,
@@ -17,6 +19,8 @@ export default async function OrderConfirmationPage({
 
   if (!order) notFound();
 
+  const orderNumber = formatOrderNumber(order.orderNumber);
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
       <div className="flex flex-col items-center text-center">
@@ -24,13 +28,18 @@ export default async function OrderConfirmationPage({
         <h1 className="mt-4 font-display text-3xl uppercase tracking-wide">
           Merci pour votre commande
         </h1>
+        <p className="mt-3 font-display text-xl tracking-wide">{orderNumber}</p>
         <p className="mt-2 text-sm text-muted">
-          Commande #{order.id.slice(-6).toUpperCase()} confirmée. Nous vous
-          contacterons pour organiser la livraison — paiement à la réception.
+          Notez ce numéro : il vous permet de suivre votre colis à tout moment.
+          Nous vous contacterons pour organiser la livraison — paiement à la réception.
         </p>
       </div>
 
-      <div className="mt-10 rounded-xl border border-border bg-surface p-6">
+      <div className="mt-8 rounded-xl border border-border bg-surface p-6">
+        <OrderStatusTimeline status={order.status} />
+      </div>
+
+      <div className="mt-6 rounded-xl border border-border bg-surface p-6">
         <h2 className="font-display text-lg uppercase tracking-wide">
           Résumé de la commande
         </h2>
@@ -60,7 +69,13 @@ export default async function OrderConfirmationPage({
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link
+          href={`/track?order=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(order.phone)}`}
+          className="rounded-full border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-foreground/40"
+        >
+          Suivre ma commande
+        </Link>
         <Link
           href="/shop/all"
           className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"

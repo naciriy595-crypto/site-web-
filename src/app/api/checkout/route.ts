@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { buildOrderMessage, buildWhatsAppLink, STORE_WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { nextOrderNumber, formatOrderNumber } from "@/lib/order-number";
 
 const checkoutSchema = z.object({
   customerName: z.string().trim().min(2, "Nom trop court").max(120),
@@ -69,21 +70,25 @@ export async function POST(req: Request) {
 
   const total = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const order = await prisma.order.create({
-    data: {
-      customerName,
-      phone,
-      city,
-      address,
-      notes: notes || null,
-      total,
-      items: { create: orderItems },
-    },
-    include: { items: true },
+  const order = await prisma.$transaction(async (tx) => {
+    const orderNumber = await nextOrderNumber(tx);
+    return tx.order.create({
+      data: {
+        orderNumber,
+        customerName,
+        phone,
+        city,
+        address,
+        notes: notes || null,
+        total,
+        items: { create: orderItems },
+      },
+      include: { items: true },
+    });
   });
 
   const message = buildOrderMessage({
-    id: order.id,
+    orderNumber: order.orderNumber,
     customerName: order.customerName,
     phone: order.phone,
     city: order.city,
@@ -94,5 +99,9 @@ export async function POST(req: Request) {
   });
   const whatsappLink = buildWhatsAppLink(STORE_WHATSAPP_NUMBER, message);
 
-  return NextResponse.json({ orderId: order.id, whatsappLink });
+  return NextResponse.json({
+    orderId: order.id,
+    orderNumber: formatOrderNumber(order.orderNumber),
+    whatsappLink,
+  });
 }

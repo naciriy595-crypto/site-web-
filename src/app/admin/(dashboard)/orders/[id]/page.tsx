@@ -4,7 +4,10 @@ import { ArrowLeft, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatMAD } from "@/lib/format";
 import { buildOrderMessage, buildWhatsAppLink, STORE_WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { formatOrderNumber } from "@/lib/order-number";
+import { buildAmeexTrackingUrl } from "@/lib/delivery/ameex";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
+import { CarrierPanel } from "@/components/admin/CarrierPanel";
 
 export default async function AdminOrderDetailPage({
   params,
@@ -17,7 +20,7 @@ export default async function AdminOrderDetailPage({
   if (!order) notFound();
 
   const message = buildOrderMessage({
-    id: order.id,
+    orderNumber: order.orderNumber,
     customerName: order.customerName,
     phone: order.phone,
     city: order.city,
@@ -27,6 +30,7 @@ export default async function AdminOrderDetailPage({
     items: order.items,
   });
   const whatsappLink = buildWhatsAppLink(STORE_WHATSAPP_NUMBER, message);
+  const trackingUrl = order.carrierTrackingId ? buildAmeexTrackingUrl(order.carrierTrackingId) : null;
 
   return (
     <div>
@@ -36,7 +40,7 @@ export default async function AdminOrderDetailPage({
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl uppercase tracking-wide">
-          Commande #{order.id.slice(-6).toUpperCase()}
+          Commande {formatOrderNumber(order.orderNumber)}
         </h1>
         <OrderStatusSelect orderId={order.id} status={order.status} />
       </div>
@@ -80,6 +84,16 @@ export default async function AdminOrderDetailPage({
             <span>Total (COD)</span>
             <span>{formatMAD(order.total)}</span>
           </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <CarrierPanel
+            orderId={order.id}
+            carrierName={order.carrierName}
+            carrierTrackingId={order.carrierTrackingId}
+            carrierLabelUrl={order.carrierLabelUrl}
+            trackingUrl={trackingUrl}
+          />
         </div>
       </div>
     </div>

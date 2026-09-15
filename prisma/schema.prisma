@@ -51,18 +51,30 @@ model Product {
   orderItems    OrderItem[]
 }
 
+// Single-row counters used to generate human-friendly sequential numbers
+// (SQLite only supports autoincrement() on the primary key, so order numbers
+// are assigned atomically in a transaction instead — see src/lib/order-number.ts).
+model Counter {
+  key   String @id
+  value Int    @default(0)
+}
+
 model Order {
-  id          String      @id @default(cuid())
-  customerName String
-  phone       String
-  city        String
-  address     String
-  notes       String?
-  status      OrderStatus @default(NEW)
-  total       Int
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  orderNumber       Int         @unique
+  customerName      String
+  phone             String
+  city              String
+  address           String
+  notes             String?
+  status            OrderStatus @default(NEW)
+  total             Int
+  carrierName       String?
+  carrierTrackingId String?
+  carrierLabelUrl   String?
+  items             OrderItem[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 }
 
 model OrderItem {
